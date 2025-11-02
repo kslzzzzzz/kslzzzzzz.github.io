@@ -1,17 +1,9 @@
 # 我的CTF题解库
 ## 🚩 2025NewStar比赛
-- [Web](/2025NewStar/web/)
-- [Misc](/2025NewStar/misc/)
-- [Crypto](/2025NewStar/crypto/)
+- [所有题解汇总](/2025NewStar/)  # 这里的路径是“/文件名/”，和你创建的2025NewStar.md对应
 ## 🚩 2025?CTF比赛
-- [Web](/2025?CTF/web/)
-- [Misc](/2025?CTF/misc/)
-- [Crypto](/2025?CTF/crypto/)
+- [所有题解汇总](/2025?CTF/)  # 后续创建这个比赛的汇总页面后，链接这么写
 ## 🚩 第十六届极客大挑战
-- [Web](/极客大挑战/web/)
-- [Misc](/极客大挑战/misc/)
-- [Crypto](/极客大挑战/crypto/)
+- [所有题解汇总](/极客大挑战/)
 ## 🚩 第八届玄武杯校外赛道
-- [Web](/玄武杯/web/)
-- [Misc](/玄武杯/misc/)
-  
+- [所有题解汇总](/玄武杯/)
