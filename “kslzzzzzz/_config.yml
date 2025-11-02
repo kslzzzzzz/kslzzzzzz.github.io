@@ -1,5 +1,13 @@
 title: 小菜鸡的CTF题解站  
 author: kslzzzzzz
 description: 记录CTF解题过程与思路 
-theme: minima        
+theme: mmistakes/minimal-mistakes  # 远程主题地址（GitHub用户名/仓库名）
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jekyll-feed
+  - jemoji
+  - jekyll-include-cache
+minimal_mistakes_skin: "dark"  ）      
 permalink: /posts/:title/  
