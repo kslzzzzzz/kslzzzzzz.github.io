@@ -1,7 +1,7 @@
 title: 小菜鸡的CTF题解站  
 author: kslzzzzzz
 description: 记录CTF解题过程与思路 
-theme: mmistakes/minimal-mistakes 
+remote_theme: mmistakes/minimal-mistakes  
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
