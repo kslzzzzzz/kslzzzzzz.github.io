@@ -11,3 +11,5 @@ plugins:
   - jekyll-include-cache
 minimal_mistakes_skin: "dark"   
 permalink: /posts/:title/  
+head_scripts:
+  - /assets/css/custom.css
