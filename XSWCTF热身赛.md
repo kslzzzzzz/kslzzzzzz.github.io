@@ -21,6 +21,35 @@ dec_img.save("1.jpg")
 ```
 ## misc4 简单的base编码 base64多次解 最后base92解出即可
 ## misc5 凯撒大帝在培根里藏了什么 培根解 然后凯撒a-z全解发现 havefuncrypto 即为flag
+## misc6 QR2 1.豆包脚本 
+```python
+from PIL import Image, ImageEnhance, ImageFilter
+def fast_radical_enhance(image_path):
+    # 1. 读取并强制转灰度
+    img = Image.open(image_path).convert("L")
+    # 2. 超级增强（对比度拉满+亮度压低，彻底显形）
+    contrast_enhancer = ImageEnhance.Contrast(img)
+    enhanced = contrast_enhancer.enhance(25)  # 对比度拉到25（极限值，必显形）
+    brightness_enhancer = ImageEnhance.Brightness(enhanced)
+    enhanced = brightness_enhancer.enhance(0.8)  # 稍微压低亮度，减少背景噪点
+    # 3. 极端二值化（阈值80，让所有潜在点阵变黑）
+    binary = enhanced.point(lambda x: 0 if x < 80 else 255, "1")
+    # 4. 快速膨胀（用Pillow内置滤镜，比手动循环快100倍！）
+    # 用“最大值滤镜”实现膨胀：每个像素取周围3x3区域的最暗值（变黑）
+    expanded = binary.filter(ImageFilter.MaxFilter(size=3))
+    # 5. 轻微锐化（让模块边缘更清晰，扫码更易识别）
+    final = expanded.filter(ImageFilter.SHARPEN)
+    # 保存结果（秒出）
+    output = "final_fast_scannable.png"
+    final.save(output)
+    print(f"✅ 处理完成！保存为 {output}")
+    print("👉 直接用手机扫码（微信/支付宝都行），这次一定能扫到！")
+# 替换为你的图片路径（和之前一样）
+fast_radical_enhance("enc2.png")
+```
+## 2.得到图片 ![解题截图](assets/images/d9d43b3bf5fafafc111daef00db23cd7.png)
+## 3.手机打开放到图库里 缩小 预览化自动处理图片就变成二维码了 ![解题截图](assets/images/b1cab1e39f0f4b2afd90f5e2e8a62143.jpg)
+## flag{AHA_U_Kn0w_QR_c0d3_A9a1n_6ca37bf1-6ad4-4e7e-ad2d-d314e0b3138a}
 # Crypto
 ## crypto1 base! 得到一串 ;DD0*;(tI8;f#?$;,g.V;D;oS<bl5D<E2ph<,>/n;L2AB;(tI8;/BE*;,g:Z;(ufR=%+i5<E2pn<%r8X;DD?T;(tI8;/B-";,g:Z<A85V=%-Xd<E2pl<%pp2;DDs4<A6m<=):W$;-%X);(ufR=%+iA:fK,/:fK,/
 ## 不知道是什么 厨子一下试试 base85-64-32 from hex 得到 XSCTF{Eazy_Cipher!}
