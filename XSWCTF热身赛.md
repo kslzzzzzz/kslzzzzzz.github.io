@@ -57,7 +57,7 @@ fast_radical_enhance("enc2.png")
 ## crypto2 遗憾 打开题目给的附件 // 题目描述：我们本可以早些进入信息化时代的，但是清政府拒不采纳那份编码规则。（注：flag为中文，使用flag{}包裹提交）然后下面是一串数字 电报码在线翻译即可
 ## crypto3 小兔子可爱捏 题目描述：宇宙的终极答案是什么？ key=42 梗呗，然后Rabbit在线解密(非在线的好像对key的长度有要求）注意一下即可 解密既得flag
 ## crypto4 Middle_math https://chat.deepseek.com/share/m5sq6ea2udnk7nr1xc
-```python
+```python 
 point1 = 84398296377673387974394799481037004942453792215867750016302914914041375345973
 point2 = 96191657337986293413741134416604284625332325559202048835251798484931595167377
 M = [
@@ -82,7 +82,7 @@ else:
     flag_bytes = long_to_bytes(flag)
     print(flag_bytes)
 ```
-## crypto5 QR 
+## crypto5 QR https://chat.deepseek.com/share/ak71mx7fcpf4lnggd6
 ```python
 from Crypto.Util.number import long_to_bytes
 p = 10324739891439898697468301673110880224481795678376622328231523654857240104590962540609277168304245692008577340795743020544523226634743472242238931053916303
@@ -100,5 +100,191 @@ n = int(bit_str, 2)
 flag = long_to_bytes(n)
 print(flag.decode())
 ```
-## crypto6
- 
+## crypto6 RSA_CBC https://chat.deepseek.com/share/7sje74w768gb2q19kf
+```python
+from Crypto.Util.number import isPrime, long_to_bytes, bytes_to_long
+import math
+# 给定值
+outputs = [6185949729345418624, 5408295634577722073, 175658213257022173, 
+          4142629054947753441, 4361315035816873430, 5664670762003653105]
+c_list = [10546544657184270108056865326461575390, 2974691170743307765063461696404543720, 
+          7904512473237371909364213640796031312, 8698645797826644152560800118783553896, 
+          1512288316727882848681192590012642566, 12802077922569556544361235996959934847, 
+          3843434733700439914702127192140089064]
+
+def recover_lcg_params(outputs):
+    """恢复LCG参数 a, b, n"""
+    # 计算差值
+    diffs = [outputs[i+1] - outputs[i] for i in range(len(outputs)-1)]
+    # 计算n
+    T = []
+    for i in range(len(diffs)-2):
+        T.append(diffs[i+2] * diffs[i] - diffs[i+1] * diffs[i+1])
+    n = T[0]
+    for t in T[1:]:
+        n = math.gcd(n, t)
+    
+    # 尝试可能的n值
+    for factor in [1, 2, 4, 8]:
+        candidate_n = n // factor
+        if candidate_n > (1 << 63) and candidate_n < (1 << 64):  # n应该是64位
+            n = candidate_n
+        break
+    
+    # 计算a
+    a = (diffs[1] * pow(diffs[0], -1, n)) % n
+    
+    # 计算b
+    b = (outputs[1] - a * outputs[0]) % n
+    
+    return a, b, n
+
+def lcg_prev(x, a, b, n):
+    """计算LCG的前一个状态"""
+    inv_a = pow(a, -1, n)
+    return ((x - b) * inv_a) % n
+
+# 恢复LCG参数
+a, b, n = recover_lcg_params(outputs)
+print(f"Recovered LCG: a={a}, b={b}, n={n}")
+
+# 验证参数
+current = outputs[0]
+for i in range(1, len(outputs)):
+    current = (a * current + b) % n
+    assert current == outputs[i], f"LCG validation failed at step {i}"
+
+print("LCG parameters validated successfully!")
+
+# 我们需要找到生成flag加密时使用的素数序列
+# 根据代码，我们需要回溯到输出之前的状态
+primes = []
+state = outputs[0]
+
+# 首先回溯到IV
+iv_state = lcg_prev(state, a, b, n)
+print(f"IV state: {iv_state}")
+
+# 继续回溯找到所有素数
+current_state = iv_state
+for _ in range(1000):
+    current_state = lcg_prev(current_state, a, b, n)
+    if isPrime(current_state):
+        primes.append(current_state)
+        if len(primes) >= 9:  # 需要9个素数
+            break
+
+if len(primes) < 9:
+    print(f"Only found {len(primes)} primes, need 9")
+    exit(1)
+
+# 反转素数列表，使其按时间顺序排列
+primes = list(reversed(primes))
+print(f"Found {len(primes)} primes")
+
+# 提取e和N
+e = primes[:7]
+N = primes[7] * primes[8]
+phi_N = (primes[7] - 1) * (primes[8] - 1)
+
+print(f"N = {N}")
+
+# 计算解密密钥
+d_list = [pow(e_i, -1, phi_N) for e_i in e]
+
+# 获取IV
+iv = long_to_bytes(iv_state)[:7]
+print(f"IV: {iv.hex()}")
+
+# 解密CBC
+plaintext_blocks = []
+current_iv = iv
+
+for i in range(7):
+    # RSA解密
+    mi = pow(c_list[i], d_list[i], N)
+    block_bytes = long_to_bytes(mi)
+    
+    # 确保块长度为7字节
+    if len(block_bytes) < 7:
+        block_bytes = b'\x00' * (7 - len(block_bytes)) + block_bytes
+    elif len(block_bytes) > 7:
+        block_bytes = block_bytes[:7]
+    
+    # CBC解密
+    msg_block = bytes([block_bytes[j] ^ current_iv[j] for j in range(min(7, len(block_bytes)))])
+    plaintext_blocks.append(msg_block)
+    current_iv = long_to_bytes(c_list[i])
+    if len(current_iv) < 7:
+        current_iv = b'\x00' * (7 - len(current_iv)) + current_iv
+    elif len(current_iv) > 7:
+        current_iv = current_iv[:7]
+# 组合并清理填充
+padded_msg = b''.join(plaintext_blocks)
+flag = padded_msg.rstrip(b'\x00')
+print(f"Decrypted bytes: {flag}")
+print(f"Flag as string: {flag.decode('latin-1')}")
+# 尝试不同的编码
+try:
+    print(f"Flag as UTF-8: {flag.decode('utf-8')}")
+except:
+    print("Flag is not valid UTF-8")
+# 尝试直接输出十六进制
+print(f"Flag in hex: {flag.hex()}")
+
+Recovered LCG: a=1054217487642659932, b=5271395802956362692, n=6228071311407392611
+LCG parameters validated successfully!
+IV state: 314200641789665321
+Found 9 primes
+N = 12922899262178569404038382350407452967
+IV: 045c43d1aa12a0
+Decrypted bytes: b'XSCTF{CBC:Nob0dy_kn0ws_R5A_b3tt3r_7han_me!!}'
+Flag as string: XSCTF{CBC:Nob0dy_kn0ws_R5A_b3tt3r_7han_me!!}
+Flag as UTF-8: XSCTF{CBC:Nob0dy_kn0ws_R5A_b3tt3r_7han_me!!}
+Flag in hex: 58534354467b4342433a4e6f623064795f6b6e3077735f5235415f6233747433725f3768616e5f6d6521217d
+```
+## crypto7 Baby_mod https://chat.deepseek.com/share/v4pkp9dpkxhusqs38o
+```python
+from Crypto.Util.number import long_to_bytes
+import sympy
+
+c = 8974862970974067747036130912778497189286015047455461723548338216071398526364092915357066347522912763259645527945964820752708582834713838572361598416992355369540775133998215538169036328380048968066595283182567486501842664486403210648396873113294001442671142286467750543591821265613564146130872866542511060063
+leak = -22224149994648923268789165509278165317007019455022228125461360264793582171180635864579051464573337703687603580778495942125972142098772460556824154925867963032811028915392488366933631534188006255843741792247909707811296603266184677505976551213494692490958051692640473222958630333160094121388820523562777011757770463239266929437423460046580341706128217879344508078081919107
+r = 3713559774641553436276209941711693805945428824832652977855633547840173231986353608653241781778848123547004971784830459033920945156217927983674366335721583894756256542949490248528661744237220067
+s = 3253961557665053735006933248952708348480142618850029234835814776973317490037893238569932660577366140882645494681486024928968833274980657993492577660282073430006337665469597700457553957032764444206539094923833498222709
+
+# 计算 s 在模 r 下的逆元
+inv_s = pow(s, -1, r)
+
+# 设置 t 的范围（15位素数）
+t_start = 2**14
+t_end = 2**15
+primes = list(sympy.primerange(t_start, t_end))
+
+for t in primes:
+    # 计算 k = t - leak
+    k = t - leak
+    # 计算候选 q
+    q_candidate = (k * inv_s) % r
+    # 检查 q_candidate 是否为 512 位素数
+    if q_candidate.bit_length() == 512 and sympy.isprime(q_candidate):
+        # 计算候选 p
+        numerator = leak - t + q_candidate * s
+        if numerator % r == 0:
+            p_candidate = numerator // r
+            if p_candidate.bit_length() == 512 and sympy.isprime(p_candidate):
+                print("Found p and q!")
+                # 计算 n 和 phi(n)
+                n = p_candidate * q_candidate
+                e = 65537
+                phi = (p_candidate - 1) * (q_candidate - 1)
+                # 计算私钥 d
+                d = pow(e, -1, phi)
+                # 解密密文
+                m = pow(c, d, n)
+                flag = long_to_bytes(m)
+                print(flag)
+                break
+Found p and q!
+b'XSCTF{Di0ph@ntin3_Equ4tIon_i5_s0_Funny:D}'
+```
