@@ -50,6 +50,7 @@ fast_radical_enhance("enc2.png")
 ## 2.得到图片 ![解题截图](assets/images/d9d43b3bf5fafafc111daef00db23cd7.png)
 ## 3.手机打开放到图库里 缩小 预览化自动处理图片就变成二维码了 ![解题截图](assets/images/b1cab1e39f0f4b2afd90f5e2e8a62143.jpg)
 ## flag{AHA_U_Kn0w_QR_c0d3_A9a1n_6ca37bf1-6ad4-4e7e-ad2d-d314e0b3138a}
+## deepseek中的enhance white 的脚本有用可惜不能被手机直接处理了,后续只能用ps自己画了太麻烦了 附链接https://chat.deepseek.com/share/z9awlv72cb70hla9c7
 # Crypto
 ## crypto1 base! 得到一串 ;DD0*;(tI8;f#?$;,g.V;D;oS<bl5D<E2ph<,>/n;L2AB;(tI8;/BE*;,g:Z;(ufR=%+i5<E2pn<%r8X;DD?T;(tI8;/B-";,g:Z<A85V=%-Xd<E2pl<%pp2;DDs4<A6m<=):W$;-%X);(ufR=%+iA:fK,/:fK,/
 ## 不知道是什么 厨子一下试试 base85-64-32 from hex 得到 XSCTF{Eazy_Cipher!}
