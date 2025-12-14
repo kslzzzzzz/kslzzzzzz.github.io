@@ -1,7 +1,7 @@
-# NexHunt CTF wirte-up
+# NexHunt CTF wirte-up 要考试捏 打了一会会
 ## Beginner
 ## huntme1 记事本打开 nexus{h1dd3n_1n_7h3_f0r357_4t_n1gh7}
-## huntme2 IDA反编译 根据逻辑即可
+## huntme2 IDA反编译 根据逻辑即可 节省时间aiexp:https://chat.deepseek.com/share/oa5eb2b4n52msfkwjq
 ```python
 byte_402060 = [
     0xF8, 0x98, 0x76, 0xFB, 0xC9, 0x0A, 0x03, 0x0D,
@@ -36,5 +36,26 @@ for i in range(32):
     flag += chr(flag_char)
 print(flag)
 ```
-## Sanity Check Discord find the rule 
-   base64.decode aiuok{j3pz0gw_g0_xe3_a4e3} key nexus 维吉尼亚解密 nexus{w3lc0me_t0_th3_g4m3}
+## sanity check 
+Discord find the rule  
+base64.decode aiuok{j3pz0gw_g0_xe3_a4e3} key is nexus 维吉尼亚解密 nexus{w3lc0me_t0_th3_g4m3}
+# Osint 
+## special horse  
+nexus{agnes_tachyon} tachyon假想的快于光速的粒子
+# Blockchain
+## silent flag  
+the key data is 0x59524f42444c6f07656803757e68730474077306797068050705024a  
+topic0 just is a signature 0x2b017342b91efedb50bcabb8f1d8e8b6e6ad1dc391c876174642e80868b896ed  
+topic1 is 0x1337 
+0x59524f42444c6f07656803757e68730474077306797068050705024a xor 37 
+ASCII is nexus{X0R_4BI_D3C0D1NG_2025}
+## chain clue
+题目描述Blockchain is fully transparent  
+We've made a transaction on the Sepolia testnet. Your flag is hidden somewhere in the transaction data.  
+Transaction Hash: 0x1c1e14180c2e5dceefc260208199e23a8c61524dd54bd2e378cee00e14555c14   
+Contract Address: 0xFb67326dAacdD9163c0eeEB9E429D7D4B6c4EBb1   
+Network: Sepolia Testnet  
+通过hash和address找到此合约0x60806040526040518060400160405280601c81526020017f6e65787573#7b54723463335f5468335f5472346e7334637431306e#7d
+出现7b 7d ASCLL转换可得nexus{Tr4c3_Th3_Tr4ns4ct10n}
+
+
